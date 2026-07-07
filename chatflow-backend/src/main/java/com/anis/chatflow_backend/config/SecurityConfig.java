@@ -1,4 +1,4 @@
-﻿package com.anis.chatflow_backend.config;
+package com.anis.chatflow_backend.config;
 
 import java.util.Arrays;
 

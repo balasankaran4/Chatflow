@@ -1,34 +1,24 @@
 package com.anis.chatflow_backend.controller;
 
-import java.util.Objects;
-
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import com.anis.chatflow_backend.model.Message;
-import com.anis.chatflow_backend.repository.MessageRepository;
+import com.anis.chatflow_backend.service.MessageService;
 
 @Controller
-
 public class ChatWebSocketController {
 
-    private final MessageRepository messageRepository;
+    private final MessageService messageService;
 
-    public ChatWebSocketController(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
+    public ChatWebSocketController(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     @MessageMapping("/sendMessage")
-
     @SendTo("/topic/messages")
-
-    public Message sendMessage(
-        Message message
-    ) {
-
-        messageRepository.save(Objects.requireNonNull(message));
-
-        return message;
+    public Message sendMessage(Message message) {
+        return messageService.saveMessage(message);
     }
 }

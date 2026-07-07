@@ -1,8 +1,9 @@
-﻿package com.anis.chatflow_backend.model;
+package com.anis.chatflow_backend.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -35,6 +36,26 @@ public class Message {
 
     @JsonIgnore
     private String timeEncrypted;
+
+    @JsonIgnore
+    @Field("sender")
+    private String legacySender;
+
+    @JsonIgnore
+    @Field("receiver")
+    private String legacyReceiver;
+
+    @JsonIgnore
+    @Field("text")
+    private String legacyText;
+
+    @JsonIgnore
+    @Field("image")
+    private String legacyImage;
+
+    @JsonIgnore
+    @Field("time")
+    private String legacyTime;
 
     private boolean delivered;
 
@@ -127,6 +148,46 @@ public class Message {
 
     public void setTimeEncrypted(String timeEncrypted) {
         this.timeEncrypted = timeEncrypted;
+    }
+
+    public String getLegacySender() {
+        return legacySender;
+    }
+
+    public void setLegacySender(String legacySender) {
+        this.legacySender = legacySender;
+    }
+
+    public String getLegacyReceiver() {
+        return legacyReceiver;
+    }
+
+    public void setLegacyReceiver(String legacyReceiver) {
+        this.legacyReceiver = legacyReceiver;
+    }
+
+    public String getLegacyText() {
+        return legacyText;
+    }
+
+    public void setLegacyText(String legacyText) {
+        this.legacyText = legacyText;
+    }
+
+    public String getLegacyImage() {
+        return legacyImage;
+    }
+
+    public void setLegacyImage(String legacyImage) {
+        this.legacyImage = legacyImage;
+    }
+
+    public String getLegacyTime() {
+        return legacyTime;
+    }
+
+    public void setLegacyTime(String legacyTime) {
+        this.legacyTime = legacyTime;
     }
 
     public boolean isDelivered() {

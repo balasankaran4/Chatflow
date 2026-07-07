@@ -1,17 +1,17 @@
 package com.anis.chatflow_backend.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,117 +22,88 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.anis.chatflow_backend.dto.ConversationStatusRequest;
+import com.anis.chatflow_backend.dto.MessageStatusEvent;
 import com.anis.chatflow_backend.model.Message;
-import com.anis.chatflow_backend.repository.MessageRepository;
+import com.anis.chatflow_backend.service.MessageService;
 
 @RestController
-
 @RequestMapping("/messages")
-
 @CrossOrigin(origins = "http://localhost:5173")
-
 public class MessageController {
 
-    private static final Map<String, byte[]> imageStore = new java.util.concurrent.ConcurrentHashMap<>();
-    private static final Map<String, String> imageMimeTypes = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<String, byte[]> IMAGE_STORE = new ConcurrentHashMap<>();
+    private static final Map<String, String> IMAGE_MIME_TYPES = new ConcurrentHashMap<>();
 
-        private final MessageRepository messageRepository;
+    private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-        public MessageController(MessageRepository messageRepository) {
-                this.messageRepository = messageRepository;
-        }
-
-    // SAVE MESSAGE
+    public MessageController(MessageService messageService, SimpMessagingTemplate messagingTemplate) {
+        this.messageService = messageService;
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @PostMapping
-
-    public Message saveMessage(
-            @RequestBody Message message
-    ) {
-
-                return messageRepository.save(Objects.requireNonNull(message));
+    public ResponseEntity<?> saveMessage(@RequestBody Message message) {
+        try {
+            Message savedMessage = messageService.saveMessage(message);
+            messagingTemplate.convertAndSend("/topic/messages", savedMessage);
+            return ResponseEntity.ok(savedMessage);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+        }
     }
-
-    // PRIVATE CHAT
 
     @GetMapping
-
-    public List<Message> getMessages(
-
-            @RequestParam String sender,
-
-            @RequestParam String receiver
-    ) {
-
-        List<Message> messages = new ArrayList<>();
-
-        messages.addAll(
-
-                messageRepository.findBySenderAndReceiver(
-                        sender,
-                        receiver
-                )
-        );
-
-        messages.addAll(
-
-                messageRepository.findByReceiverAndSender(
-                        sender,
-                        receiver
-                )
-        );
-
-        return messages;
+    public List<Message> getMessages(@RequestParam String sender, @RequestParam String receiver) {
+        return messageService.getConversation(sender, receiver);
     }
 
-    // IMAGE UPLOAD
+    @PostMapping("/status/delivered")
+    public ResponseEntity<List<MessageStatusEvent>> markDelivered(@RequestBody ConversationStatusRequest request) {
+        List<MessageStatusEvent> events = messageService.markDelivered(request.currentUserEmail(), request.otherUserEmail());
+        events.forEach(event -> messagingTemplate.convertAndSend("/topic/message-status", event));
+        return ResponseEntity.ok(events);
+    }
+
+    @PostMapping("/status/seen")
+    public ResponseEntity<List<MessageStatusEvent>> markSeen(@RequestBody ConversationStatusRequest request) {
+        List<MessageStatusEvent> events = messageService.markSeen(request.currentUserEmail(), request.otherUserEmail());
+        events.forEach(event -> messagingTemplate.convertAndSend("/topic/message-status", event));
+        return ResponseEntity.ok(events);
+    }
 
     @PostMapping("/upload")
-    public Map<String, String> uploadImage(
-            @RequestParam MultipartFile file
-    ) throws IOException {
-        
+    public Map<String, String> uploadImage(@RequestParam MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "File is empty");
             return error;
         }
 
-        // Generate unique ID for image
         String imageId = UUID.randomUUID().toString();
-        
-        // Store image in memory
-        imageStore.put(imageId, file.getBytes());
-        imageMimeTypes.put(imageId, file.getContentType());
+        IMAGE_STORE.put(imageId, file.getBytes());
+        IMAGE_MIME_TYPES.put(imageId, file.getContentType());
 
-        // Return simple URL reference
         Map<String, String> response = new HashMap<>();
         response.put("imageUrl", "http://localhost:8080/messages/image/" + imageId);
         response.put("imageId", imageId);
         response.put("fileName", file.getOriginalFilename());
-
         return response;
     }
-
-    // IMAGE RETRIEVAL
 
     @GetMapping("/image/{imageId}")
     @CrossOrigin(origins = "http://localhost:5173")
     public ResponseEntity<Resource> getImage(@PathVariable String imageId) {
-        byte[] imageBytes = imageStore.get(imageId);
-        
+        byte[] imageBytes = IMAGE_STORE.get(imageId);
         if (imageBytes == null) {
             return ResponseEntity.notFound().build();
         }
-        
-                String mimeType = imageMimeTypes.get(imageId);
-                if (mimeType == null) {
-                        mimeType = "application/octet-stream";
-                }
-        
-        return ResponseEntity
-            .ok()
-            .contentType(MediaType.parseMediaType(mimeType))
-            .body(new ByteArrayResource(imageBytes));
+
+        String mimeType = IMAGE_MIME_TYPES.getOrDefault(imageId, "application/octet-stream");
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(mimeType))
+                .body(new ByteArrayResource(imageBytes));
     }
 }

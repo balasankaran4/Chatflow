@@ -1,4 +1,4 @@
-﻿package com.anis.chatflow_backend.repository;
+package com.anis.chatflow_backend.repository;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,4 +13,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmailHash(String emailHash);
 
     List<User> findByEmailHashIn(Collection<String> emailHashes);
+
+    List<User> findByEmail(String email);
 }
