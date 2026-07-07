@@ -165,6 +165,14 @@ function Chat({
     setInspectedImage(null);
   };
 
+  const getInspectorName = (msg) => {
+    if (!msg) {
+      return "";
+    }
+
+    return msg.sender === currentUser ? "You" : msg.sender;
+  };
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {

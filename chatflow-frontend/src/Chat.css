@@ -787,9 +787,7 @@ body{
 
   padding:0;
 
-  background:rgba(0,0,0,0.94);
-
-  backdrop-filter:blur(10px);
+  background:#111b21;
 }
 
 .image-inspector-shell{
@@ -802,7 +800,7 @@ body{
 
   flex-direction:column;
 
-  background:rgba(0,0,0,0.96);
+  background:#0b141a;
 
   overflow:hidden;
 }
@@ -819,36 +817,82 @@ body{
 
   gap:16px;
 
-  padding:14px 18px;
+  padding:12px 20px;
 
-  background:linear-gradient(180deg, rgba(0,0,0,0.82), rgba(0,0,0,0.35));
+  background:#202c33;
 
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.image-inspector-user{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:14px;
+
+  min-width:0;
+
+  flex:1;
 }
 
 .image-inspector-back,
+.image-inspector-close,
+.image-inspector-icon{
 
-.image-inspector-close{
+  width:40px;
 
-  width:44px;
-
-  height:44px;
+  height:40px;
 
   border:none;
 
   border-radius:50%;
 
+  background:transparent;
+
+  color:#e9edef;
+
+  cursor:pointer;
+
+  flex-shrink:0;
+
+  font-size:20px;
+}
+
+.image-inspector-back:hover,
+.image-inspector-close:hover,
+.image-inspector-icon:hover{
+
   background:rgba(255,255,255,0.08);
+}
+
+.image-inspector-avatar{
+
+  width:40px;
+
+  height:40px;
+
+  border-radius:50%;
+
+  background:linear-gradient(135deg, #00a884, #53bdeb);
 
   color:white;
 
-  cursor:pointer;
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:15px;
+
+  font-weight:700;
 
   flex-shrink:0;
 }
 
 .image-inspector-title{
-
-  flex:1;
 
   min-width:0;
 
@@ -856,24 +900,43 @@ body{
 
   flex-direction:column;
 
-  align-items:flex-start;
+  gap:2px;
 }
 
 .image-inspector-title h3{
 
   font-size:15px;
 
-  font-weight:700;
+  font-weight:600;
 
-  color:white;
+  color:#e9edef;
 }
 
 .image-inspector-title p{
 
   font-size:12px;
 
-  color:rgba(255,255,255,0.68);
+  color:#8696a0;
+}
 
+.image-inspector-actions{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:4px;
+}
+
+.image-inspector-body{
+
+  flex:1;
+
+  min-height:0;
+
+  display:flex;
+
+  background:#0b141a;
 }
 
 .image-inspector-viewport{
@@ -888,7 +951,7 @@ body{
 
   justify-content:center;
 
-  padding:18px 14px;
+  padding:32px;
 
   overflow:hidden;
 }
@@ -905,47 +968,128 @@ body{
 
   object-fit:contain;
 
+  border-radius:10px;
+
   user-select:none;
 
   -webkit-user-drag:none;
+
+  box-shadow:0 18px 48px rgba(0, 0, 0, 0.45);
 }
 
-.image-inspector-bottombar{
+.image-inspector-details{
+
+  width:320px;
+
+  max-width:34vw;
+
+  padding:20px 16px;
+
+  background:#111b21;
+
+  border-left:1px solid rgba(255,255,255,0.06);
 
   display:flex;
 
-  flex-wrap:wrap;
+  flex-direction:column;
 
-  gap:12px 20px;
+  gap:14px;
+}
 
-  padding:14px 18px 18px;
+.image-inspector-card{
 
-  border-top:1px solid rgba(255,255,255,0.06);
+  padding:16px;
 
-  background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.82));
+  border-radius:16px;
+
+  background:#202c33;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:6px;
+}
+
+.image-inspector-label{
+
+  font-size:11px;
+
+  letter-spacing:0.4px;
+
+  text-transform:uppercase;
+
+  color:#8696a0;
+}
+
+.image-inspector-card strong{
+
+  font-size:15px;
+
+  color:#e9edef;
+}
+
+.image-inspector-card p{
 
   font-size:13px;
 
-  color:rgba(255,255,255,0.7);
+  color:#8696a0;
+}
+
+@media(max-width:900px){
+
+  .image-inspector-body{
+
+    flex-direction:column;
+  }
+
+  .image-inspector-viewport{
+
+    padding:20px 14px;
+  }
+
+  .image-inspector-details{
+
+    width:100%;
+
+    max-width:none;
+
+    padding:14px;
+
+    border-left:none;
+
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
 }
 
 @media(max-width:700px){
 
   .image-inspector-topbar{
 
-    padding:12px 12px;
+    padding:10px 12px;
   }
 
-  .image-inspector-viewport{
+  .image-inspector-user{
 
-    padding:12px 10px;
+    gap:10px;
   }
 
-  .image-inspector-bottombar{
+  .image-inspector-avatar{
 
-    gap:8px 12px;
+    width:36px;
 
-    padding:12px 14px 16px;
+    height:36px;
+  }
+
+  .image-inspector-back,
+  .image-inspector-close,
+  .image-inspector-icon{
+
+    width:36px;
+
+    height:36px;
+
+    font-size:18px;
   }
 }
 
