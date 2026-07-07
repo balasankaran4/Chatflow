@@ -1,21 +1,16 @@
-package com.anis.chatflow_backend.repository;
-
-import com.anis.chatflow_backend.model.Message;
-
-import org.springframework.data.mongodb.repository.MongoRepository;
+﻿package com.anis.chatflow_backend.repository;
 
 import java.util.List;
 
-public interface MessageRepository
-        extends MongoRepository<Message, String> {
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-    List<Message> findBySenderAndReceiver(
-            String sender,
-            String receiver
-    );
+import com.anis.chatflow_backend.model.Message;
 
-    List<Message> findByReceiverAndSender(
-            String receiver,
-            String sender
-    );
+public interface MessageRepository extends MongoRepository<Message, String> {
+
+    List<Message> findByConversationIdOrderByCreatedAtAsc(String conversationId);
+
+    List<Message> findByConversationIdAndReceiverHashAndDeliveredFalse(String conversationId, String receiverHash);
+
+    List<Message> findByConversationIdAndReceiverHashAndSeenFalse(String conversationId, String receiverHash);
 }

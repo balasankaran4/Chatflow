@@ -1,31 +1,61 @@
-package com.anis.chatflow_backend.model;
+﻿package com.anis.chatflow_backend.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "messages")
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@Document(collection = "messages")
 public class Message {
 
     @Id
     private String id;
 
-    private String sender;
+    @JsonIgnore
+    private String conversationId;
 
-    private String receiver;
+    @JsonIgnore
+    private String senderHash;
 
-    private String text;
+    @JsonIgnore
+    private String receiverHash;
 
-    private String image;
+    @JsonIgnore
+    private String senderEncrypted;
 
-    private String time;
+    @JsonIgnore
+    private String receiverEncrypted;
+
+    @JsonIgnore
+    private String textEncrypted;
+
+    @JsonIgnore
+    private String imageEncrypted;
+
+    @JsonIgnore
+    private String timeEncrypted;
+
+    private boolean delivered;
 
     private boolean seen;
 
-    private boolean typing;
+    private long createdAt;
 
-    public Message() {
-    }
+    @Transient
+    private String sender;
+
+    @Transient
+    private String receiver;
+
+    @Transient
+    private String text;
+
+    @Transient
+    private String image;
+
+    @Transient
+    private String time;
 
     public String getId() {
         return id;
@@ -33,6 +63,94 @@ public class Message {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
+
+    public String getSenderHash() {
+        return senderHash;
+    }
+
+    public void setSenderHash(String senderHash) {
+        this.senderHash = senderHash;
+    }
+
+    public String getReceiverHash() {
+        return receiverHash;
+    }
+
+    public void setReceiverHash(String receiverHash) {
+        this.receiverHash = receiverHash;
+    }
+
+    public String getSenderEncrypted() {
+        return senderEncrypted;
+    }
+
+    public void setSenderEncrypted(String senderEncrypted) {
+        this.senderEncrypted = senderEncrypted;
+    }
+
+    public String getReceiverEncrypted() {
+        return receiverEncrypted;
+    }
+
+    public void setReceiverEncrypted(String receiverEncrypted) {
+        this.receiverEncrypted = receiverEncrypted;
+    }
+
+    public String getTextEncrypted() {
+        return textEncrypted;
+    }
+
+    public void setTextEncrypted(String textEncrypted) {
+        this.textEncrypted = textEncrypted;
+    }
+
+    public String getImageEncrypted() {
+        return imageEncrypted;
+    }
+
+    public void setImageEncrypted(String imageEncrypted) {
+        this.imageEncrypted = imageEncrypted;
+    }
+
+    public String getTimeEncrypted() {
+        return timeEncrypted;
+    }
+
+    public void setTimeEncrypted(String timeEncrypted) {
+        this.timeEncrypted = timeEncrypted;
+    }
+
+    public boolean isDelivered() {
+        return delivered;
+    }
+
+    public void setDelivered(boolean delivered) {
+        this.delivered = delivered;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getSender() {
@@ -73,21 +191,5 @@ public class Message {
 
     public void setTime(String time) {
         this.time = time;
-    }
-
-    public boolean isSeen() {
-        return seen;
-    }
-
-    public void setSeen(boolean seen) {
-        this.seen = seen;
-    }
-
-    public boolean isTyping() {
-        return typing;
-    }
-
-    public void setTyping(boolean typing) {
-        this.typing = typing;
     }
 }
