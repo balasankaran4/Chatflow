@@ -24,6 +24,7 @@ function Chat({
   const [typing, setTyping] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [image, setImage] = useState(null);
+  const [inspectedImage, setInspectedImage] = useState(null);
 
   const messagesEndRef = useRef(null);
   const stompClient = useRef(null);
@@ -156,6 +157,28 @@ function Chat({
     setShowEmoji(false);
   };
 
+  const openImageInspector = (msg) => {
+    setInspectedImage(msg);
+  };
+
+  const closeImageInspector = () => {
+    setInspectedImage(null);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeImageInspector();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="chat-app">
       <div className="sidebar">
@@ -242,7 +265,15 @@ function Chat({
               {msg.text && msg.text !== "" && <p>{msg.text}</p>}
 
               {msg.image && msg.image !== "" && (
-                <img src={msg.image} alt="chat" className="chat-image" />
+                <button
+                  type="button"
+                  className="chat-image-button"
+                  onClick={() => openImageInspector(msg)}
+                  aria-label="Open shared image inspector"
+                >
+                  <img src={msg.image} alt="shared chat" className="chat-image" />
+                  <span className="chat-image-hint">Tap to inspect</span>
+                </button>
               )}
 
               <span className="msg-time">{msg.time}</span>
@@ -251,6 +282,53 @@ function Chat({
 
           <div ref={messagesEndRef}></div>
         </div>
+
+        {inspectedImage && (
+          <div
+            className="image-inspector-backdrop"
+            onClick={closeImageInspector}
+          >
+            <div className="image-inspector-shell" onClick={(event) => event.stopPropagation()}>
+              <div className="image-inspector-topbar">
+                <button
+                  type="button"
+                  className="image-inspector-back"
+                  onClick={closeImageInspector}
+                  aria-label="Back"
+                >
+                  ←
+                </button>
+
+                <div className="image-inspector-title">
+                  <h3>{inspectedImage.sender === currentUser ? "You" : inspectedImage.sender}</h3>
+                  <p>{inspectedImage.time || "Shared image"}</p>
+                </div>
+
+                <button
+                  type="button"
+                  className="image-inspector-close"
+                  onClick={closeImageInspector}
+                  aria-label="Close image viewer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="image-inspector-viewport">
+                <img
+                  src={inspectedImage.image}
+                  alt="shared chat preview"
+                  className="image-inspector-image"
+                />
+              </div>
+
+              <div className="image-inspector-bottombar">
+                <span>Sender: {inspectedImage.sender}</span>
+                <span>Receiver: {inspectedImage.receiver}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="message-input">
           <label className="image-upload">
